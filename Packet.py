@@ -150,6 +150,11 @@ class Packet(Endian):
         fmt = "%si" % self._isEndian()
         self._addbuf(struct.pack(fmt, value))
 
+    def writeInt64(self, value):
+        """"""
+        fmt = "%sq" % self._isEndian()
+        self._addbuf(struct.pack(fmt, value))
+
     def writeUnsignedInt(self, value):
         """ """
         fmt = "%sI" % self._isEndian()
