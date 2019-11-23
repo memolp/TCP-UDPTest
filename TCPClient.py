@@ -46,9 +46,9 @@ def SocketHandler():
 
 import binascii
 import time
-def send(sock):
-    start = time.time()*1000
-    #for i in range(100000):
+import threading
+
+def CreatePacket():
     # 发送的数据需要再重新包装
     sendPacket = Packet.Packet()
     # 起始标记
@@ -71,29 +71,45 @@ def send(sock):
     sendPacket.writeUnsignedInt(sendPacket.length() - 5)
     # 发送数据
     buff = sendPacket.getvalue()
-    for i in range(100000):
+    return buff
+
+def send(sock, size=2000000):
+    start = time.time()*1000
+    #for i in range(100000):
+    buff = CreatePacket()
+    i = 0
+    while i < size:
         sock.sendall(buff)
+        i += 1
     print("end::{0}ms".format(time.time() * 1000 - start ))
     #time.sleep(2)
+
+def RecvMsgThread(sock):
+    """"""
+    while True:
+        data = sock.recv(409600)
 
 def run_main_udp():
     """
     运行
     :return:
     """
-
-
+    print(binascii.hexlify(CreatePacket()))
+    return
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     #sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 5400000)
     #sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 5400000)
     sock.setsockopt(socket.SOL_TCP, socket.TCP_NODELAY, 1)
     sock.connect(("127.0.0.1",7090))
+    p = threading.Thread(target=RecvMsgThread, args=(sock,))
+    p.start()
     for i in range(100):
         start = time.time()*1000
-        send(sock)
+        send(sock, 10000)
         cost =time.time() *1000 - start
+        print("cost {0} ms".format(cost))
         if cost < 1000.0:
-            time.sleep(cost/1000)
+            time.sleep(1 - cost/1000)
     #print(binascii.hexlify(buff))
 
 
