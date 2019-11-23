@@ -44,33 +44,36 @@ def SocketHandler():
         except:
             pass
 
+import binascii
 import time
 def send(sock):
-    for i in range(1000):
-        # 发送的数据需要再重新包装
-        sendPacket = Packet.Packet()
-        # 起始标记
-        sendPacket.writeUnsignedByte(0xEF)
-        # 协议长度-预先站位
-        sendPacket.writeUnsignedInt(0)
-        # 用户vuer
-        sendPacket.writeUnsignedInt(1)
-        # 发送的序列号
-        sendPacket.writeInt64(int(time.time() * 1000))
-        # sockid
-        sendPacket.writeUnsignedByte(1)
-        # 消息ID
-        sendPacket.writeUnsignedShort(2000)
-        # 内容
-        sendPacket.writeUTFBytes("asdasdkkkkk99sd0fsd909sdf9sd0fs90df09sd90fsd09fsd90f09")
-        # 更新长度
-        sendPacket.position = 1
-        # 写入正确的协议长度 不包含起始标记和长度自己
-        sendPacket.writeUnsignedInt(sendPacket.length() - 5)
-        # 发送数据
-        buff = sendPacket.getvalue()
-
+    start = time.time()*1000
+    #for i in range(100000):
+    # 发送的数据需要再重新包装
+    sendPacket = Packet.Packet()
+    # 起始标记
+    sendPacket.writeUnsignedByte(0xEF)
+    # 协议长度-预先站位
+    sendPacket.writeUnsignedInt(0)
+    # 用户vuer
+    sendPacket.writeUnsignedInt(1)
+    # 发送的序列号
+    sendPacket.writeInt64(int(time.time() * 1000))
+    # sockid
+    sendPacket.writeUnsignedByte(1)
+    # 消息ID
+    sendPacket.writeUnsignedShort(2000)
+    # 内容
+    sendPacket.writeUTFBytes("asdasdkkkkk99sd0fsd909sdf9sd0fs90df09sd90fsd09fsd90f09")
+    # 更新长度
+    sendPacket.position = 1
+    # 写入正确的协议长度 不包含起始标记和长度自己
+    sendPacket.writeUnsignedInt(sendPacket.length() - 5)
+    # 发送数据
+    buff = sendPacket.getvalue()
+    for i in range(100000):
         sock.sendall(buff)
+    print("end::{0}ms".format(time.time() * 1000 - start ))
     #time.sleep(2)
 
 def run_main_udp():
@@ -79,15 +82,18 @@ def run_main_udp():
     :return:
     """
 
-    import binascii
+
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 8192)
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 8192)
+    #sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 5400000)
+    #sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 5400000)
     sock.setsockopt(socket.SOL_TCP, socket.TCP_NODELAY, 1)
     sock.connect(("127.0.0.1",7090))
-    for i in range(1000):
+    for i in range(100):
+        start = time.time()*1000
         send(sock)
-        time.sleep(1)
+        cost =time.time() *1000 - start
+        if cost < 1000.0:
+            time.sleep(cost/1000)
     #print(binascii.hexlify(buff))
 
 
