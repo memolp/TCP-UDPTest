@@ -94,8 +94,8 @@ def run_main_udp():
     运行
     :return:
     """
-    print(binascii.hexlify(CreatePacket()))
-    return
+    # print(binascii.hexlify(CreatePacket()))
+    # return
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     #sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 5400000)
     #sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 5400000)
@@ -105,7 +105,7 @@ def run_main_udp():
     p.start()
     for i in range(100):
         start = time.time()*1000
-        send(sock, 10000)
+        send(sock, 60000)
         cost =time.time() *1000 - start
         print("cost {0} ms".format(cost))
         if cost < 1000.0:
